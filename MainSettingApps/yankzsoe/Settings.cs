@@ -69,5 +69,43 @@ namespace MainSettingApps.yankzsoe {
                 throw es;
             }
         }
+
+        public static bool UpdateMainAppSetting(string settingKey, string newValue) {
+            try {
+                bool result = false;
+                ExeConfigurationFileMap ecf = new ExeConfigurationFileMap { ExeConfigFilename = ConfigFilePath };
+                Configuration config = ConfigurationManager.OpenMappedExeConfiguration(ecf, ConfigurationUserLevel.None);
+                if (config.HasFile) {
+                    config.AppSettings.Settings[settingKey].Value = newValue;
+                    config.Save(ConfigurationSaveMode.Modified);
+                    ConfigurationManager.RefreshSection("appSettings");
+                    result = true;
+                } else {
+                    result = false;
+                }
+                return result;
+            } catch (Exception es) {
+                throw es;
+            }
+        }
+
+        public static bool UpdateMainConnectionString(string connectionStringName, string newValue) {
+            try {
+                bool result = false;
+                ExeConfigurationFileMap ecf = new ExeConfigurationFileMap { ExeConfigFilename = ConfigFilePath };
+                Configuration config = ConfigurationManager.OpenMappedExeConfiguration(ecf, ConfigurationUserLevel.None);
+                if (config.HasFile) {
+                    config.ConnectionStrings.ConnectionStrings[connectionStringName].ConnectionString = newValue;
+                    config.Save(ConfigurationSaveMode.Modified);
+                    ConfigurationManager.RefreshSection("connectionStrings");
+                    result = true;
+                } else {
+                    result = false;
+                }
+                return result;
+            } catch (Exception es) {
+                throw es;
+            }
+        }
     }
 }
