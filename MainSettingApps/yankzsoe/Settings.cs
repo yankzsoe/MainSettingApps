@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 namespace MainSettingApps.yankzsoe {
     class Settings {
         public static string ConfigFilePath { get; set; }
-        public static Tuple<bool, string> GetTupleMainAppSetting(string settingSection) {
+        public static Tuple<bool, string> GetTupleMainAppSetting(string settingKey) {
             try {
                 ExeConfigurationFileMap ecf = new ExeConfigurationFileMap { ExeConfigFilename = ConfigFilePath };
                 Configuration config = ConfigurationManager.OpenMappedExeConfiguration(ecf, ConfigurationUserLevel.None);
                 if (config.HasFile) {
                     AppSettingsSection appSettings = config.AppSettings;
-                    KeyValueConfigurationElement element = appSettings.Settings[settingSection];
+                    KeyValueConfigurationElement element = appSettings.Settings[settingKey];
                     return new Tuple<bool, string>(true, element.Value);
                 } else {
                     return new Tuple<bool, string>(false, null);
@@ -39,13 +39,13 @@ namespace MainSettingApps.yankzsoe {
             }
         }
 
-        public static string GetStringMainAppSetting(string settingSection) {
+        public static string GetStringMainAppSetting(string settingKey) {
             try {
                 ExeConfigurationFileMap ecf = new ExeConfigurationFileMap { ExeConfigFilename = ConfigFilePath };
                 Configuration config = ConfigurationManager.OpenMappedExeConfiguration(ecf, ConfigurationUserLevel.None);
                 if (config.HasFile) {
                     AppSettingsSection appSettings = config.AppSettings;
-                    KeyValueConfigurationElement element = appSettings.Settings[settingSection];
+                    KeyValueConfigurationElement element = appSettings.Settings[settingKey];
                     return element.Value;
                 } else {
                     return null;
