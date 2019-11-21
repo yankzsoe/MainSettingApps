@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MainSettingApps.yankzsoe {
-    class Settings {
+    public class Settings {
         public static string ConfigFilePath { get; set; }
         public static Tuple<bool, string> GetTupleMainAppSetting(string settingKey) {
             try {
