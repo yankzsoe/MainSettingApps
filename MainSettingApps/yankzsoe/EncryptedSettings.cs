@@ -1,17 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MainSettingApps.yankzsoe.Tools;
+using System;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MainSettingApps.yankzsoe {
-    public class Settings {
+    public class EncryptedSettings {
         private static string configFilePath = "Config/App.config";
         public static string ConfigFilePath {
             get => configFilePath;
             set => configFilePath = value;
         }
+        private static string key = "JakartaSelatan2019";
+        public static string Key {
+            get => key;
+            set => key = value;
+        }
+
         public static Tuple<bool, string> GetTupleMainAppSetting(string settingKey) {
             try {
                 ExeConfigurationFileMap ecf = new ExeConfigurationFileMap { ExeConfigFilename = ConfigFilePath };
@@ -19,7 +22,8 @@ namespace MainSettingApps.yankzsoe {
                 if (config.HasFile) {
                     AppSettingsSection appSettings = config.AppSettings;
                     KeyValueConfigurationElement element = appSettings.Settings[settingKey];
-                    return new Tuple<bool, string>(true, element.Value);
+                    var result = AesEncryption.DecryptString(Key, element.Value);
+                    return new Tuple<bool, string>(true, result);
                 } else {
                     return new Tuple<bool, string>(false, null);
                 }
@@ -34,7 +38,8 @@ namespace MainSettingApps.yankzsoe {
                 Configuration config = ConfigurationManager.OpenMappedExeConfiguration(ecf, ConfigurationUserLevel.None);
                 if (config.HasFile) {
                     ConnectionStringsSection con = config.ConnectionStrings;
-                    return new Tuple<bool, string>(true, con.ConnectionStrings[connectionStringName].ConnectionString);
+                    var result = AesEncryption.DecryptString(Key, con.ConnectionStrings[connectionStringName].ConnectionString);
+                    return new Tuple<bool, string>(true, result);
                 } else {
                     return new Tuple<bool, string>(false, null);
                 }
@@ -50,7 +55,8 @@ namespace MainSettingApps.yankzsoe {
                 if (config.HasFile) {
                     AppSettingsSection appSettings = config.AppSettings;
                     KeyValueConfigurationElement element = appSettings.Settings[settingKey];
-                    return element.Value;
+                    var result = AesEncryption.DecryptString(Key, element.Value);
+                    return result;
                 } else {
                     return null;
                 }
@@ -65,7 +71,8 @@ namespace MainSettingApps.yankzsoe {
                 Configuration config = ConfigurationManager.OpenMappedExeConfiguration(ecf, ConfigurationUserLevel.None);
                 if (config.HasFile) {
                     ConnectionStringsSection con = config.ConnectionStrings;
-                    return con.ConnectionStrings[connectionStringName].ConnectionString;
+                    var result = AesEncryption.DecryptString(Key, con.ConnectionStrings[connectionStringName].ConnectionString);
+                    return result;
                 } else {
                     return null;
                 }
@@ -80,7 +87,8 @@ namespace MainSettingApps.yankzsoe {
                 ExeConfigurationFileMap ecf = new ExeConfigurationFileMap { ExeConfigFilename = ConfigFilePath };
                 Configuration config = ConfigurationManager.OpenMappedExeConfiguration(ecf, ConfigurationUserLevel.None);
                 if (config.HasFile) {
-                    config.AppSettings.Settings[settingKey].Value = newValue;
+                    var cipherString = AesEncryption.EncryptString(Key, newValue);
+                    config.AppSettings.Settings[settingKey].Value = cipherString;
                     config.Save(ConfigurationSaveMode.Modified);
                     ConfigurationManager.RefreshSection("appSettings");
                     result = true;
@@ -99,7 +107,8 @@ namespace MainSettingApps.yankzsoe {
                 ExeConfigurationFileMap ecf = new ExeConfigurationFileMap { ExeConfigFilename = ConfigFilePath };
                 Configuration config = ConfigurationManager.OpenMappedExeConfiguration(ecf, ConfigurationUserLevel.None);
                 if (config.HasFile) {
-                    config.ConnectionStrings.ConnectionStrings[connectionStringName].ConnectionString = newValue;
+                    var cipherString = AesEncryption.EncryptString(Key, newValue);
+                    config.ConnectionStrings.ConnectionStrings[connectionStringName].ConnectionString = cipherString;
                     config.Save(ConfigurationSaveMode.Modified);
                     ConfigurationManager.RefreshSection("connectionStrings");
                     result = true;
@@ -111,5 +120,6 @@ namespace MainSettingApps.yankzsoe {
                 throw es;
             }
         }
+
     }
 }
